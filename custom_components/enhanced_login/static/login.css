@@ -1,0 +1,226 @@
+/* Enhanced Login - design for /auth/authorize and /auth/oidc/*.
+   Colors, tile color and logo come from /enhanced-login/theme.css (generated from
+   the default Home Assistant theme); the values in @layer el-defaults are only a fallback. */
+
+@layer el-defaults {
+  :root {
+    --el-bg: #F3F4F6; --el-card: #FFFFFF; --el-text: #101B2D; --el-muted: #667085;
+    --el-border: rgba(16,24,40,0.08); --el-border-strong: rgba(16,24,40,0.16);
+    --el-accent: #175CD3; --el-on-accent: #FFFFFF; --el-error: #DC2626; --el-particles: 0.12;
+    --el-tile: #0F172A; --el-logo: url(/enhanced-login/logo);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --el-bg: #0D192D; --el-card: #1B273A; --el-text: #F1F5F9; --el-muted: #94A3B8;
+      --el-border: rgba(255,255,255,0.10); --el-border-strong: rgba(255,255,255,0.18);
+      --el-accent: #4C8DF6; --el-error: #F87171; --el-particles: 0.35;
+      color-scheme: dark;
+    }
+  }
+}
+
+:root {
+  --el-input: var(--el-card);
+  --el-input-hover: color-mix(in srgb, var(--el-text) 4%, var(--el-card));
+  --el-ring: color-mix(in srgb, var(--el-accent) 22%, transparent);
+
+  /* Map HA variables to the values (stock page and Tailwind pages of the integration) */
+  --primary-color: var(--el-accent);
+  --mdc-theme-primary: var(--el-accent);
+  --ha-color-primary-30: color-mix(in srgb, var(--el-accent) 82%, black);
+  --primary-background-color: var(--el-bg);
+  --card-background-color: var(--el-card);
+  --primary-text-color: var(--el-text);
+  --secondary-text-color: var(--el-muted);
+  --divider-color: var(--el-border);
+  --error-color: var(--el-error);
+  --ha-color-form-background: var(--el-input);
+  --ha-color-form-background-hover: var(--el-input-hover);
+  --ha-color-border-neutral-loud: var(--el-border-strong);
+  --ha-color-focus: var(--el-accent);
+}
+
+html { background: var(--el-bg) !important; color: var(--el-text) !important; }
+/* The background sits on html so the particle canvas (z-index -1) stays visible */
+body { background: transparent !important; color: var(--el-text); font-family: Roboto, Noto, system-ui, sans-serif; }
+
+/* ---------- Logo tile (stock page: .header, integration pages: first child) ---------- */
+.content > .header,
+body > .w-full.max-w-sm > div:first-child {
+  aspect-ratio: 6 / 5;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 !important;
+  justify-self: end;
+  display: block;
+  background: var(--el-tile) var(--el-logo) center / 62% auto no-repeat;
+  border: 1px solid var(--el-border);
+  border-radius: 28px;
+}
+.content > .header img,
+body > .w-full.max-w-sm > div:first-child img { display: none !important; }
+
+/* ---------- Stock sign-in (/auth/authorize) ---------- */
+body:has(ha-authorize) { padding: 32px 24px !important; min-height: 100vh; box-sizing: border-box; }
+.content {
+  max-width: 960px !important;
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 400px);
+  justify-content: center;
+  gap: 56px;
+  align-items: center;
+  align-content: center;
+  row-gap: 0;
+  padding: 0 !important;
+}
+/* HA already draws the particles subtly; dark ~90 %, light ~30 % */
+canvas#particles { opacity: min(1, calc(var(--el-particles) * 2.6)); }
+
+ha-authorize .card-content { background: transparent !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+ha-authorize, ha-authorize .card-content, ha-auth-flow h1, ha-auth-flow p, ha-checkbox, .footer, ha-pick-auth-provider { color: var(--el-text) !important; }
+ha-auth-flow { align-items: stretch !important; }
+ha-auth-flow form { max-width: none !important; text-align: left !important; }
+ha-auth-flow h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; text-align: left; line-height: 1.15; }
+ha-auth-flow h1::after {
+  content: "Sign in to control your home.";
+  display: block; margin-top: 8px; font-size: 16px; font-weight: 400; letter-spacing: 0; color: var(--el-muted);
+}
+html:lang(de) ha-auth-flow h1::after { content: "Melde dich an, um dein Zuhause zu steuern."; }
+ha-auth-form { margin-top: 28px !important; }
+
+ha-auth-textfield .base {
+  height: 54px !important; border: 1px solid var(--el-border-strong); border-radius: 12px !important;
+  background: var(--el-input) !important;
+}
+ha-auth-textfield .base:hover { background: var(--el-input-hover) !important; }
+ha-auth-textfield .base::after { display: none !important; }
+ha-auth-textfield .base:focus-within { border-color: var(--el-accent); box-shadow: 0 0 0 4px var(--el-ring); }
+/* Required field / error: the whole field turns red */
+ha-auth-textfield .base.invalid {
+  border-color: var(--el-error) !important;
+  background: color-mix(in srgb, var(--el-error) 12%, var(--el-input)) !important;
+}
+ha-auth-textfield .base.invalid:hover {
+  background: color-mix(in srgb, var(--el-error) 16%, var(--el-input)) !important;
+}
+ha-auth-textfield .base.invalid:focus-within {
+  border-color: var(--el-error) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--el-error) 24%, transparent);
+}
+ha-auth-textfield .base.invalid label { color: var(--el-error) !important; }
+ha-auth-textfield .hint.error {
+  color: var(--el-error) !important; font-size: 13px; font-weight: 500; padding: 6px 4px 0;
+}
+ha-auth-textfield label { color: var(--el-muted) !important; }
+ha-auth-textfield input { color: var(--el-text) !important; caret-color: var(--el-accent); }
+
+.action { width: 100% !important; max-width: none !important; }
+.action ha-button { display: block !important; width: 100% !important; }
+.action ha-button::part(base) {
+  height: 52px; border-radius: 14px; background: var(--el-accent); color: var(--el-on-accent);
+  font-weight: 600; font-size: 16px;
+}
+html.el-await ha-auth-flow form { visibility: hidden; }
+
+/* Back to the choice (SSO / local account) */
+.el-back {
+  grid-column: 2; grid-row: 2; justify-self: start; align-self: start;
+  display: inline-flex; align-items: center; gap: 10px;
+  height: 44px; margin-top: 4px; padding: 0 18px 0 14px;
+  border: 1px solid var(--el-border-strong); border-radius: 12px;
+  color: var(--el-text); background: transparent;
+  font-size: 15px; font-weight: 600; text-decoration: none;
+  transition: background .15s ease;
+}
+.el-back:hover { background: var(--el-input-hover); }
+.el-back:focus-visible { outline: 3px solid var(--el-ring); outline-offset: 2px; }
+.el-back::before {
+  content: ""; width: 18px; height: 18px; flex: none; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* ---------- Pages of the integration (Tailwind) ---------- */
+body > .w-full.max-w-sm {
+  max-width: 960px !important;
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 400px);
+  justify-content: center;
+  grid-template-rows: 1fr auto 1fr;
+  column-gap: 56px;
+  align-items: start;
+}
+body > .w-full.max-w-sm > div:first-child { grid-column: 1; grid-row: 1 / 4; align-self: center; }
+body > .w-full.max-w-sm > div:nth-child(2) { grid-column: 2; grid-row: 2; }
+body > .w-full.max-w-sm > div:nth-child(3) { grid-column: 2; grid-row: 3; justify-content: flex-start; padding-top: 16px; }
+body > .w-full.max-w-sm > div.bg-card { background: transparent !important; border: 0 !important; padding: 0 !important; }
+body > .w-full.max-w-sm .text-center { text-align: left !important; }
+body > .w-full.max-w-sm a.text-muted { color: var(--el-muted); }
+
+.el-title { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin: 0; }
+.el-sub { font-size: 16px; color: var(--el-muted); margin: 8px 0 28px; }
+body > .w-full.max-w-sm h1 { font-size: 34px !important; font-weight: 700 !important; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 20px !important; }
+body > .w-full.max-w-sm h2 { font-size: 18px; font-weight: 600; color: var(--el-text); }
+
+/* Buttons */
+body > .w-full.max-w-sm a.inline-flex.w-full,
+body > .w-full.max-w-sm button.inline-flex.w-full {
+  height: 54px !important; border-radius: 14px !important; font-size: 16px; font-weight: 600;
+  background: var(--el-accent); color: var(--el-on-accent); border: 1px solid transparent;
+  text-decoration: none; transition: filter .15s ease, background .15s ease;
+}
+body > .w-full.max-w-sm a.inline-flex.w-full:hover,
+body > .w-full.max-w-sm button.inline-flex.w-full:hover { filter: brightness(1.08); }
+body > .w-full.max-w-sm a.inline-flex.w-full:focus-visible,
+body > .w-full.max-w-sm button.inline-flex.w-full:focus-visible { outline: 3px solid var(--el-ring); outline-offset: 2px; }
+
+/* Microsoft */
+#login-button[data-el="ms"] { background: #FFFFFF; color: #0F172A; border-color: var(--el-border-strong); }
+#login-button[data-el="ms"]::before {
+  content: ""; width: 20px; height: 20px; margin-right: 12px; flex: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 21 21'%3E%3Crect x='1' y='1' width='9' height='9' fill='%23f25022'/%3E%3Crect x='11' y='1' width='9' height='9' fill='%237fba00'/%3E%3Crect x='1' y='11' width='9' height='9' fill='%2300a4ef'/%3E%3Crect x='11' y='11' width='9' height='9' fill='%23ffb900'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+/* Secondary actions (local account, approve) */
+#alternative-sign-in-link, #approve-login-button {
+  background: transparent !important; color: var(--el-text) !important; border-color: var(--el-border-strong) !important;
+}
+#approve-login-button { color: var(--el-accent) !important; border-color: var(--el-accent) !important; }
+
+/* Separator "or" */
+body > .w-full.max-w-sm .relative.my-4 { margin: 22px 0 !important; }
+body > .w-full.max-w-sm .relative .bg-card { background: var(--el-bg) !important; color: var(--el-muted); }
+body > .w-full.max-w-sm .border-divider { border-color: var(--el-border) !important; }
+
+/* Sections (finish page) */
+body > .w-full.max-w-sm .rounded-lg.border {
+  background: var(--el-card) !important; border-color: var(--el-border) !important; border-radius: 18px !important; padding: 24px !important;
+}
+#device-code, #device-code-input {
+  background: var(--el-input) !important; border: 1px solid var(--el-border-strong) !important; border-radius: 12px !important; color: var(--el-text);
+}
+#device-code-input { height: 54px; font-size: 22px; }
+#device-code-input:focus { border-color: var(--el-accent) !important; box-shadow: 0 0 0 4px var(--el-ring); outline: none; }
+body > .w-full.max-w-sm .text-muted { color: var(--el-muted); }
+body > .w-full.max-w-sm [class*="bg-"][class*="/12"] { border-radius: 12px; padding: 12px; }
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 820px) {
+  .content { grid-template-columns: minmax(0, 1fr); gap: 28px; max-width: 420px !important; }
+  body > .w-full.max-w-sm {
+    grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; row-gap: 24px; max-width: 420px !important;
+  }
+  .content > .header,
+  body > .w-full.max-w-sm > div:first-child {
+    aspect-ratio: auto; height: 130px; max-width: none; justify-self: stretch; background-size: auto 66%;
+    grid-column: 1; grid-row: 1;
+  }
+  .el-back { grid-column: 1; grid-row: 3; }
+  body > .w-full.max-w-sm > div:nth-child(2) { grid-column: 1; grid-row: 2; }
+  body > .w-full.max-w-sm > div:nth-child(3) { grid-column: 1; grid-row: 3; padding-top: 0; }
+  .el-title, ha-auth-flow h1, body > .w-full.max-w-sm h1 { font-size: 28px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
