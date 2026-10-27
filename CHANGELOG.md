@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+- Fix: a `logo` inside the configuration folder (for example `logo.png`) was rejected because
+  Home Assistant's default allowlist only covers `www` and `media`. Files inside the
+  configuration folder are now accepted; paths outside it still need `allowlist_external_dirs`.
+
 ## 0.1.0
 
 First public release.

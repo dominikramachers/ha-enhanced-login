@@ -253,6 +253,18 @@ class FaviconView(HomeAssistantView):
         )
 
 
+def _is_readable(hass: HomeAssistant, path: Path) -> bool:
+    """Files inside the configuration folder are fine (the YAML is admin-controlled).
+
+    Home Assistant's allowlist by default only covers ``www`` and ``media``, so
+    anything else outside the configuration folder must be allowlisted explicitly.
+    """
+    resolved = path.resolve()
+    if resolved.is_relative_to(Path(hass.config.config_dir).resolve()):
+        return True
+    return bool(hass.config.is_allowed_path(str(resolved)))
+
+
 def _load_settings(hass: HomeAssistant, conf: dict) -> Settings:
     """Read the logo and the template files (runs in the executor)."""
     settings = Settings()
@@ -264,8 +276,11 @@ def _load_settings(hass: HomeAssistant, conf: dict) -> Settings:
             suffix = path.suffix.lower()
             if suffix not in _LOGO_TYPES:
                 raise ValueError(f"unsupported file type {suffix or '(none)'}")
-            if not hass.config.is_allowed_path(str(path)):
-                raise ValueError("path is not allowed (allowlist_external_dirs)")
+            if not _is_readable(hass, path):
+                raise ValueError(
+                    "path is outside the configuration folder and not allowed "
+                    "(allowlist_external_dirs)"
+                )
             if path.stat().st_size > _LOGO_MAX_BYTES:
                 raise ValueError("file is larger than 2 MB")
             data = path.read_bytes()

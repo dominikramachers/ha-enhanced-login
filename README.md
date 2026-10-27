@@ -71,7 +71,7 @@ enhanced_login:
 
 | Option       | Default                | Description |
 |--------------|------------------------|-------------|
-| `logo`       | bundled placeholder    | Path to your logo. Relative paths start in the Home Assistant configuration folder; absolute paths must be allowed by `allowlist_external_dirs`. A transparent logo with a wide aspect ratio (about 6:5) works best. |
+| `logo`       | bundled placeholder    | Path to your logo. Relative paths start in the Home Assistant configuration folder (for example `www/logo.png`). Files inside the configuration folder always work; paths outside it must be listed in `allowlist_external_dirs`. A transparent logo with a wide aspect ratio (about 6:5) works best. |
 | `tile_color` | `#0F172A`              | Color behind the logo, also used as the background of the favicon. |
 | `favicon`    | `true` if `logo` is set, else `false` | Replaces the browser icon on the sign-in pages **and in the whole Home Assistant UI** with an icon rendered from the logo. The bundled placeholder never replaces your favicon unless you set `favicon: true`. |
 

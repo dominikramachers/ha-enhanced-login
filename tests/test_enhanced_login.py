@@ -18,12 +18,16 @@ class FakeConfig:
 
     def __init__(self, base: Path):
         self._base = base
+        self.config_dir = str(base)
+        # Like Home Assistant: only www and media are allowed by default,
+        # the configuration folder itself is not.
+        self.allowed = [str(base / "www"), str(base / "media")]
 
     def path(self, *parts: str) -> str:
         return str(self._base.joinpath(*parts))
 
     def is_allowed_path(self, path: str) -> bool:
-        return str(path).startswith(str(self._base))
+        return any(str(path).startswith(a) for a in self.allowed)
 
 
 class FakeHass:
@@ -86,10 +90,37 @@ def test_invalid_logo_falls_back_to_placeholder(tmp_path, name):
 
 
 def test_logo_outside_allowed_paths_is_rejected(tmp_path):
-    outside = tmp_path.parent / "outside.png"
+    base = tmp_path / "config"
+    base.mkdir()
+    outside = tmp_path / "outside.png"
     outside.write_bytes(b"\x89PNG-outside")
-    settings = el._load_settings(FakeHass(tmp_path), {"logo": str(outside)})
+    settings = el._load_settings(FakeHass(base), {"logo": str(outside)})
     assert b"outside" not in settings.logo
+
+
+def test_logo_in_config_root_is_accepted(tmp_path):
+    (tmp_path / "logo.png").write_bytes(b"\x89PNG-root")
+    settings = el._load_settings(FakeHass(tmp_path), {"logo": "logo.png"})
+    assert settings.logo.endswith(b"root")
+
+
+def test_logo_in_www_is_accepted(tmp_path):
+    (tmp_path / "www").mkdir()
+    (tmp_path / "www" / "logo.png").write_bytes(b"\x89PNG-www")
+    settings = el._load_settings(FakeHass(tmp_path), {"logo": "www/logo.png"})
+    assert settings.logo.endswith(b"www")
+
+
+def test_logo_in_allowlisted_external_dir_is_accepted(tmp_path):
+    base = tmp_path / "config"
+    base.mkdir()
+    ext = tmp_path / "ext"
+    ext.mkdir()
+    (ext / "logo.png").write_bytes(b"\x89PNG-ext")
+    hass = FakeHass(base)
+    hass.config.allowed.append(str(ext))
+    settings = el._load_settings(hass, {"logo": str(ext / "logo.png")})
+    assert settings.logo.endswith(b"ext")
 
 
 # ---------------------------------------------------------------- theme ----
