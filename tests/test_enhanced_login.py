@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -278,3 +279,35 @@ def test_patch_routes_is_idempotent():
     assert el._patch_routes(hass, settings) == 1
     assert el._patch_routes(hass, settings) == 0
     assert route._handler._el_patched is True
+
+
+# ------------------------------------------------------------ static files --
+
+
+def test_classes_used_by_scripts_exist_in_the_stylesheet():
+    """Guards against renamed-but-not-updated class names between JS and CSS."""
+    static = Path(el.__file__).parent / "static"
+    css = (static / "login.css").read_text(encoding="utf-8")
+    used = set()
+    for name in ("login.js", "favicon.js", "particles.js"):
+        text = (static / name).read_text(encoding="utf-8")
+        used |= set(re.findall(r"""["'.](el-[a-z-]+)["']?""", text))
+    used.discard("el-accent")  # CSS custom property, read via getPropertyValue("--el-accent")
+    assert used, "expected the scripts to reference el- classes"
+    for cls in sorted(used):
+        assert f".{cls}" in css, f"{cls} is used in a script but not defined in login.css"
+
+
+def test_injected_class_names_exist_in_the_stylesheet():
+    css = (Path(el.__file__).parent / "static" / "login.css").read_text(encoding="utf-8")
+    source = Path(el.__file__).read_text(encoding="utf-8")
+    for cls in set(re.findall(r'class=\\?"(el-[a-z-]+)', source)):
+        assert f".{cls}" in css, cls
+    assert '[data-el="ms"]' in css
+
+
+def test_no_leftover_legacy_prefix_in_static_files():
+    static = Path(el.__file__).parent / "static"
+    for name in ("login.css", "login.js", "favicon.js", "particles.js"):
+        text = (static / name).read_text(encoding="utf-8")
+        assert not re.search(r"\bdl-|data-dl|--dl-", text), f"legacy dl- prefix left in {name}"

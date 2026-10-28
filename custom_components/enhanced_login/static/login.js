@@ -66,7 +66,7 @@
       .replace(/[?&]$/, "");
     var original = location.origin + location.pathname + query;
     var link = document.createElement("a");
-    link.className = "dl-back";
+    link.className = "el-back";
     link.href = "/auth/oidc/welcome?redirect_uri=" + encodeURIComponent(btoa(original));
     var lang = (document.documentElement.lang || navigator.language || "en").slice(0, 2).toLowerCase();
     link.textContent = lang === "de" ? "Zurück" : "Back";

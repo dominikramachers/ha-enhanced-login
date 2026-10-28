@@ -13,6 +13,21 @@ A unified, theme-aware design for the Home Assistant sign-in. It restyles
 so that a single-sign-on setup (for example Microsoft Entra ID) looks like one coherent product
 instead of three different pages.
 
+## Screenshots
+
+| Dark | Light |
+|------|-------|
+| ![Welcome page, dark](docs/screenshots/welcome-dark.png) | ![Welcome page, light](docs/screenshots/welcome-light.png) |
+| ![Local sign-in, dark](docs/screenshots/login-dark.png) | ![Local sign-in, light](docs/screenshots/login-light.png) |
+
+| Required fields turn red | Narrow screens |
+|--------------------------|----------------|
+| ![Required fields, dark](docs/screenshots/login-required-dark.png) | <img src="docs/screenshots/welcome-mobile-dark.png" width="260" alt="Welcome page on a phone, dark"> |
+
+The screenshots show the SSO choice page of hass-oidc-auth and the regular sign-in page with a
+custom `logo`, a custom `tile_color` and a theme with light and dark mode. German texts follow
+the Home Assistant language setting.
+
 ## Features
 
 - **Follows your Home Assistant theme.** Colors are generated live from the *default* theme (light

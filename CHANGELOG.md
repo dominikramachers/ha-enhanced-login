@@ -5,6 +5,9 @@
 - Fix: the particle background is now also shown on the SSO choice page (and the other
   hass-oidc-auth pages), so it is present in the whole sign-in flow. The stock sign-in page keeps
   drawing its own particles.
+- Fix: the "Back" link on the local login was unstyled (class name mismatch between script and
+  stylesheet). Tests now guard against such mismatches.
+- Screenshots in the README.
 
 ## 0.1.1
 
