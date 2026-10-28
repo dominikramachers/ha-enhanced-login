@@ -54,7 +54,7 @@ _LOGGER = logging.getLogger(__name__)
 
 URL = "/enhanced-login"
 STATIC_DIR = Path(__file__).parent / "static"
-ASSETS = ("login.css", "login.js")  # served as static files
+ASSETS = ("login.css", "login.js", "particles.js")  # served as static files
 DEFAULT_LOGO = "logo-default.png"
 DEFAULT_TILE = "#0F172A"
 
@@ -465,7 +465,7 @@ _ICON_TAGS = re.compile(
 )
 
 
-def _inject(html: str, settings: Settings) -> str:
+def _inject(html: str, settings: Settings, path: str = "") -> str:
     version = settings.version
     if settings.favicon:
         html = _ICON_TAGS.sub("", html)
@@ -474,6 +474,9 @@ def _inject(html: str, settings: Settings) -> str:
         f'<link rel="stylesheet" href="{URL}/login.css?v={version}">'
     )
     script = f'<script src="{URL}/login.js?v={version}" defer></script>'
+    if "/auth/oidc/" in path:
+        # the stock sign-in page draws its own particles; the OIDC pages get the same look
+        script += f'<script src="{URL}/particles.js?v={version}" defer></script>'
     if settings.favicon:
         script += f'<script src="{URL}/favicon.js?v={version}" defer></script>'
     if "</head>" in html:
@@ -578,7 +581,7 @@ async def _transform(hass, request, response, settings: Settings):
         if "</head>" not in html:
             return response
         return web.Response(
-            text=_inject(html, settings),
+            text=_inject(html, settings, request.path),
             content_type="text/html",
             headers={"Cache-Control": "no-cache"},
         )
@@ -596,7 +599,7 @@ async def _transform(hass, request, response, settings: Settings):
         lang = (hass.config.language or "en").split("-")[0].lower()
         html = transform_oidc_page(html, lang)
 
-    response.text = _inject(html, settings)
+    response.text = _inject(html, settings, request.path)
     response.headers.pop("Content-Length", None)
     response.headers["Cache-Control"] = "no-cache"
     return response

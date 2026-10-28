@@ -197,6 +197,14 @@ def test_inject_adds_assets_and_strips_icons_only_with_favicon():
     assert "favicon.js?v=v1" in full and 'href="/x.ico"' not in full
 
 
+def test_particles_only_injected_on_oidc_pages():
+    page = "<html><head></head><body></body></html>"
+    settings = el.Settings(version="v1")
+    assert "particles.js" in el._inject(page, settings, "/auth/oidc/welcome")
+    # the stock sign-in page draws its own particles
+    assert "particles.js" not in el._inject(page, settings, "/auth/authorize")
+
+
 # -------------------------------------------------------- route wrapping ---
 
 

@@ -18,7 +18,7 @@ instead of three different pages.
 - **Follows your Home Assistant theme.** Colors are generated live from the *default* theme (light
   and dark), with a built-in fallback palette.
 - **Two-column layout** with a logo tile, inputs and buttons with 54 px touch targets, a single
-  column with a logo banner on narrow screens, particle background kept (subtle).
+  column with a logo banner on narrow screens, particle background on every page of the flow (subtle).
 - **Clear form states:** invalid or required fields turn red as a whole field; a **Back** link
   leads from the local login back to the SSO / local choice.
 - **Localized texts** for the hass-oidc-auth pages: German and English (taken from the Home

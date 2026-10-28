@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Fix: the particle background is now also shown on the SSO choice page (and the other
+  hass-oidc-auth pages), so it is present in the whole sign-in flow. The stock sign-in page keeps
+  drawing its own particles.
+
 ## 0.1.1
 
 - Fix: a `logo` inside the configuration folder (for example `logo.png`) was rejected because
