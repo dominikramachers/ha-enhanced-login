@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.3
+
+- Fix: with hass-oidc-auth 1.3.0 the SSO button lost its white Microsoft style (logo, white
+  background). hass-oidc-auth now ships German texts itself, so the button no longer says
+  "Login with Microsoft" and the page rewrite did not recognize it. The script now tags the
+  button as Microsoft by its localized text ("Microsoft" or "Entra"), in any language.
+
 ## 0.1.2
 
 - Fix: the particle background is now also shown on the SSO choice page (and the other
