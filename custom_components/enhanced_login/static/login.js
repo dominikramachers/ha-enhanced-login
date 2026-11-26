@@ -3,6 +3,7 @@
      automatically, in any language (the integration itself only detects "Login aborted")
    - hides that intermediate step so it does not flash
    - adds a "Back" link on the local login when it was opened from the SSO welcome page
+   - marks the SSO button as Microsoft in any language (hass-oidc-auth >= 1.3 is localized itself)
    Without this script everything stays usable; only the intermediate step is visible. */
 (function () {
   "use strict";
@@ -75,4 +76,22 @@
   }
 
   if (!add()) document.addEventListener("DOMContentLoaded", add);
+})();
+
+/* Microsoft button: hass-oidc-auth >= 1.3 translates its texts itself, so the button no longer
+   says "Login with Microsoft". Tag it by its (localized) text so the white style with the logo applies. */
+(function () {
+  "use strict";
+  if (location.pathname.indexOf("/auth/oidc/") !== 0) return;
+
+  function mark() {
+    var button = document.getElementById("login-button");
+    if (!button) return false;
+    if (!button.hasAttribute("data-el") && /microsoft|entra/i.test(button.textContent || "")) {
+      button.setAttribute("data-el", "ms");
+    }
+    return true;
+  }
+
+  if (!mark()) document.addEventListener("DOMContentLoaded", mark);
 })();
